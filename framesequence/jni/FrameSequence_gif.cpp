@@ -63,7 +63,7 @@ FrameSequence_gif::FrameSequence_gif(Stream* stream) :
 
     if (DGifSlurp(mGif) != GIF_OK) {
         ALOGW("Gif slurp failed");
-        DGifCloseFile(mGif);
+        DGifCloseFile(mGif, NULL);
         mGif = NULL;
         return;
     }
@@ -132,7 +132,7 @@ FrameSequence_gif::FrameSequence_gif(Stream* stream) :
 
 FrameSequence_gif::~FrameSequence_gif() {
     if (mGif) {
-        DGifCloseFile(mGif);
+        DGifCloseFile(mGif, NULL);
     }
     delete[] mPreservedFrames;
     delete[] mRestoringFrames;
@@ -157,7 +157,7 @@ static bool checkIfCover(const GifImageDesc& target, const GifImageDesc& covered
 static void copyLine(Color8888* dst, const unsigned char* src, const ColorMapObject* cmap,
                      int transparent, int width) {
     for (; width > 0; width--, src++, dst++) {
-        if (*src != transparent) {
+        if (*src != transparent && *src < cmap->ColorCount) {
             *dst = gifColorToColor8888(cmap->Colors[*src]);
         }
     }
